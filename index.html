@@ -37,11 +37,8 @@
     </div>
 
     <script>
-        // URL del archivo JSON donde se almacenarán los datos
-        const jsonURL = 'https://danieltronix.github.io/p1/employees.json';
-
-        // Variable para almacenar los datos de los empleados
-        var employeesData = [];
+        // Cargar datos de empleados desde el almacenamiento local
+        var employeesData = JSON.parse(localStorage.getItem('employees')) || [];
 
         // Función para mostrar los empleados en la tabla
         function displayEmployees() {
@@ -58,33 +55,13 @@
             });
         }
 
-        // Función para cargar los datos de empleados desde el archivo JSON
-        function loadEmployees() {
-            fetch(jsonURL)
-                .then(response => response.json())
-                .then(data => {
-                    employeesData = data;
-                    displayEmployees();
-                })
-                .catch(error => console.error('Error al cargar los datos:', error));
-        }
-
-        // Función para guardar los empleados en el archivo JSON
+        // Función para guardar los empleados en el almacenamiento local
         function saveEmployees() {
-            fetch(jsonURL, {
-                method: 'PUT',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify(employeesData)
-            })
-            .then(response => response.text())
-            .then(message => console.log('Mensaje del servidor:', message))
-            .catch(error => console.error('Error al guardar los datos:', error));
+            localStorage.setItem('employees', JSON.stringify(employeesData));
         }
 
         // Mostrar empleados al cargar la página
-        loadEmployees();
+        displayEmployees();
 
         // Manejar el envío del formulario para agregar un nuevo empleado
         document.getElementById('employeeForm').addEventListener('submit', function(event) {
@@ -108,7 +85,7 @@
             // Mostrar actualización en la tabla
             displayEmployees();
 
-            // Guardar empleados en el archivo JSON
+            // Guardar empleados en el almacenamiento local
             saveEmployees();
 
             // Limpiar el formulario
