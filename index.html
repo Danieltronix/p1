@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Registro de Empleados</title>
+</head>
+<body>
+    <h1>Registro de Empleados</h1>
+    <div id="formSection">
+        <h2>Nuevo Empleado</h2>
+        <form id="employeeForm">
+            <label for="name">Nombre:</label><br>
+            <input type="text" id="name" name="name"><br>
+            <label for="phone">Teléfono:</label><br>
+            <input type="text" id="phone" name="phone"><br>
+            <label for="area">Área:</label><br>
+            <input type="text" id="area" name="area"><br><br>
+            <button type="submit">Guardar</button>
+        </form>
+    </div>
+
+    <div id="tableSection">
+        <h2>Empleados Registrados</h2>
+        <table id="employeeTable">
+            <thead>
+                <tr>
+                    <th>Nombre</th>
+                    <th>Teléfono</th>
+                    <th>Área</th>
+                </tr>
+            </thead>
+            <tbody>
+                <!-- Datos de los empleados se agregarán aquí dinámicamente -->
+            </tbody>
+        </table>
+    </div>
+
+    <script>
+        // URL del archivo JSON donde se almacenarán los datos
+        const jsonURL = 'https://tuusuario.github.io/turepositorio/employees.json';
+
+        // Variable para almacenar los datos de los empleados
+        var employeesData = [];
+
+        // Función para mostrar los empleados en la tabla
+        function displayEmployees() {
+            var tableBody = document.querySelector('#employeeTable tbody');
+            tableBody.innerHTML = '';
+
+            employeesData.forEach(function(employee) {
+                var row = '<tr>';
+                row += '<td>' + employee.nombre + '</td>';
+                row += '<td>' + employee.telefono + '</td>';
+                row += '<td>' + employee.area + '</td>';
+                row += '</tr>';
+                tableBody.innerHTML += row;
+            });
+        }
+
+        // Función para cargar los datos de empleados desde el archivo JSON
+        function loadEmployees() {
+            fetch(jsonURL)
+                .then(response => response.json())
+                .then(data => {
+                    employeesData = data;
+                    displayEmployees();
+                })
+                .catch(error => console.error('Error al cargar los datos:', error));
+        }
+
+        // Función para guardar los empleados en el archivo JSON
+        function saveEmployees() {
+            fetch(jsonURL, {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(employeesData)
+            })
+            .then(response => response.text())
+            .then(message => console.log('Mensaje del servidor:', message))
+            .catch(error => console.error('Error al guardar los datos:', error));
+        }
+
+        // Mostrar empleados al cargar la página
+        loadEmployees();
+
+        // Manejar el envío del formulario para agregar un nuevo empleado
+        document.getElementById('employeeForm').addEventListener('submit', function(event) {
+            event.preventDefault();
+
+            // Obtener valores del formulario
+            var name = document.getElementById('name').value;
+            var phone = document.getElementById('phone').value;
+            var area = document.getElementById('area').value;
+
+            // Crear objeto de empleado
+            var employee = {
+                "nombre": name,
+                "telefono": phone,
+                "area": area
+            };
+
+            // Agregar el nuevo empleado al array de datos
+            employeesData.push(employee);
+
+            // Mostrar actualización en la tabla
+            displayEmployees();
+
+            // Guardar empleados en el archivo JSON
+            saveEmployees();
+
+            // Limpiar el formulario
+            document.getElementById('employeeForm').reset();
+
+            alert('Empleado registrado correctamente.');
+        });
+    </script>
+</body>
+</html>
